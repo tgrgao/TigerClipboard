@@ -16,12 +16,12 @@ class TigerClipboardServer {
         std::pair<Status, std::string> copy(std::string copiedString);
         std::pair<Status, std::string> paste();
 
-        const Status getStatus() const {return status_;}
+        const Status status() const {return status_;}
         const CopyMode copyMode() const {return copyMode_;}
         const PasteMode pasteMode() const {return pasteMode_;}
-        const std::deque<std::string>& getClipboard() const {return clipboard_;}
-        const std::deque<std::string>::iterator& getCopyIterator() const {return copyIterator_;}
-        const std::deque<std::string>::iterator& getPasteIterator() const {return pasteIterator_;}
+        const std::deque<std::string>& clipboard() const {return clipboard_;}
+        const std::deque<std::string>::iterator& copyIterator() const {return copyIterator_;}
+        const std::deque<std::string>::iterator& pasteIterator() const {return pasteIterator_;}
 
     private:
         Status status_;
