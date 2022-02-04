@@ -5,8 +5,8 @@
 class TigerClipboardServer {
     public:
         enum Status {OK, NOT_OK};
-        enum CopyMode {FRONT, BEFORE, STATIC, AFTER, BACK};
-        enum PasteMode {FRONT, FORWARDS, STATIC, BACKWARDS, BACK};
+        enum CopyMode {COPY_FRONT, COPY_BEFORE, COPY_STATIC, COPY_AFTER, COPY_BACK};
+        enum PasteMode {PASTE_FRONT, PASTE_FORWARDS, PASTE_STATIC, PASTE_BACKWARDS, PASTE_BACK};
 
         Status initServer();
         CopyMode setCopyMode(CopyMode newCopyMode);
