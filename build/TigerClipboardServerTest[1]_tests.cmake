@@ -1,0 +1,5 @@
+add_test( TigerClipboardServerTest.CheckInitializedValues C:/Users/tgao2/TigerClipboard/build/Debug/TigerClipboardServerTest.exe [==[--gtest_filter=TigerClipboardServerTest.CheckInitializedValues]==] --gtest_also_run_disabled_tests)
+set_tests_properties( TigerClipboardServerTest.CheckInitializedValues PROPERTIES WORKING_DIRECTORY C:/Users/tgao2/TigerClipboard/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+add_test( TigerClipboardServerTest.TestStaticCopy C:/Users/tgao2/TigerClipboard/build/Debug/TigerClipboardServerTest.exe [==[--gtest_filter=TigerClipboardServerTest.TestStaticCopy]==] --gtest_also_run_disabled_tests)
+set_tests_properties( TigerClipboardServerTest.TestStaticCopy PROPERTIES WORKING_DIRECTORY C:/Users/tgao2/TigerClipboard/build SKIP_REGULAR_EXPRESSION [==[\[  SKIPPED \]]==])
+set( TigerClipboardServerTest_TESTS TigerClipboardServerTest.CheckInitializedValues TigerClipboardServerTest.TestStaticCopy)

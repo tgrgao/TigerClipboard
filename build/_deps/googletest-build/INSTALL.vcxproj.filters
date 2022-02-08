@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\tgao2\TigerClipboard\build\CMakeFiles\9987d2f475494ce53793b14c7c1faad4\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{A216E2E0-85B3-3580-81FA-C9DEF74BDC2F}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

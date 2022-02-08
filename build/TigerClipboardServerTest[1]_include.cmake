@@ -1,0 +1,5 @@
+if(EXISTS "C:/Users/tgao2/TigerClipboard/build/TigerClipboardServerTest[1]_tests.cmake")
+  include("C:/Users/tgao2/TigerClipboard/build/TigerClipboardServerTest[1]_tests.cmake")
+else()
+  add_test(TigerClipboardServerTest_NOT_BUILT TigerClipboardServerTest_NOT_BUILT)
+endif()

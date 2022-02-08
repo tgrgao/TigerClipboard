@@ -1,6 +1,7 @@
 #include "TigerClipboardServer.h"
 
 TigerClipboardServer::Status TigerClipboardServer::initServer() {
+    status_ = Status::OK;
     copyMode_ = CopyMode::COPY_STATIC;
     pasteMode_ = PasteMode::PASTE_STATIC;
     copyIterator_ = clipboard_.begin();
@@ -41,10 +42,12 @@ TigerClipboardServer::PasteMode TigerClipboardServer::setPasteMode(PasteMode new
 
 TigerClipboardServer::Status TigerClipboardServer::setCopyIterator(const std::deque<std::string>::iterator& newCopyIterator) {
     copyIterator_ = clipboard_.erase(newCopyIterator, newCopyIterator);
+    return Status::OK;
 }
 
 TigerClipboardServer::Status TigerClipboardServer::setPasteIterator(const std::deque<std::string>::iterator& newPasteIterator) {
     pasteIterator_ = clipboard_.erase(newPasteIterator, newPasteIterator);
+    return Status::OK;
 }
 
 std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::copy(std::string copiedString) {

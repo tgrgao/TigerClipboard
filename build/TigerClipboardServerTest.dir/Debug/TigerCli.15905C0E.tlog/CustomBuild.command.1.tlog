@@ -1,0 +1,10 @@
+^C:\USERS\TGAO2\TIGERCLIPBOARD\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/tgao2/TigerClipboard -BC:/Users/tgao2/TigerClipboard/build --check-stamp-file C:/Users/tgao2/TigerClipboard/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
