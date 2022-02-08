@@ -1,3 +1,0 @@
-TigerClipboardServerTest.CheckInitializedValues 1 0.0100755
-TigerClipboardServerTest.TestStaticCopy 2 0.0047911
----
