@@ -47,11 +47,10 @@ TEST_F(TigerClipboardServerTest, CheckInitializedValues) {
     EXPECT_EQ(clipboardServer.pasteIterator(), clipboardServer.clipboard().begin());
 }
 
-TEST_F(TigerClipboardServerTest, TestStaticCopy) {
+TEST_F(TigerClipboardServerTest, TestCopyStatic) {
     TigerClipboardServer clipboardServer;
     clipboardServer.initServer();
     clipboardServer.copy("a");
-    std::cout << *clipboardServer.pasteIterator();
     clipboardServer.copy("b");
     clipboardServer.copy("c");
     clipboardServer.copy("d");
@@ -61,6 +60,66 @@ TEST_F(TigerClipboardServerTest, TestStaticCopy) {
 
     EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
 }
+
+TEST_F(TigerClipboardServerTest, TestCopyFront) {
+    TigerClipboardServer clipboardServer;
+    clipboardServer.initServer();
+    clipboardServer.copy("a");
+    clipboardServer.copy("b");
+    clipboardServer.copy("c");
+    clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_FRONT);
+    clipboardServer.copy("d");
+    clipboardServer.copy("e");
+
+    std::deque<std::string> targetDeque ({"e", "d", "c"});
+
+    EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
+}
+
+TEST_F(TigerClipboardServerTest, TestCopyBack) {
+    TigerClipboardServer clipboardServer;
+    clipboardServer.initServer();
+    clipboardServer.copy("a");
+    clipboardServer.copy("b");
+    clipboardServer.copy("c");
+    clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BACK);
+    clipboardServer.copy("d");
+    clipboardServer.copy("e");
+
+    std::deque<std::string> targetDeque ({"c", "d", "e"});
+
+    EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
+}
+
+TEST_F(TigerClipboardServerTest, TestCopyBefore) {
+    TigerClipboardServer clipboardServer;
+    clipboardServer.initServer();
+    clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BACK);
+    clipboardServer.copy("a");
+    clipboardServer.copy("b");
+    clipboardServer.copy("c");
+    clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BEFORE);
+    clipboardServer.copy("d");
+    clipboardServer.copy("e");
+
+    std::deque<std::string> targetDeque ({"a", "b", "d", "e", "c"});
+
+    EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
+}
+
+TEST_F(TigerClipboardServerTest, DEBUG) {
+    TigerClipboardServer clipboardServer;
+    clipboardServer.initServer();
+    clipboardServer.copy("a");
+    clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_FRONT);
+    clipboardServer.copy("d");
+    //clipboardServer.copy("e");
+
+    std::deque<std::string> targetDeque ({"e", "d", "c"});
+
+    //EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
+}
+
 
 }  // namespace
 

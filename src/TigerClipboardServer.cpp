@@ -1,4 +1,5 @@
 #include "TigerClipboardServer.h"
+#include <iostream>
 
 TigerClipboardServer::Status TigerClipboardServer::initServer() {
     status_ = Status::OK;
@@ -6,6 +7,7 @@ TigerClipboardServer::Status TigerClipboardServer::initServer() {
     pasteMode_ = PasteMode::PASTE_STATIC;
     copyIterator_ = clipboard_.begin();
     pasteIterator_ = copyIterator_;
+    
     if (pasteIterator_ != clipboard_.end()) return Status::NOT_OK; //sanity check
     return Status::OK;
 }
@@ -17,7 +19,7 @@ TigerClipboardServer::CopyMode TigerClipboardServer::setCopyMode(CopyMode newCop
             copyIterator_ = clipboard_.begin();
             break;
         case CopyMode::COPY_BACK:
-            copyIterator_ = clipboard_.end() - 1;
+            copyIterator_ = clipboard_.end();
             break;
         default:
             break;
@@ -32,7 +34,7 @@ TigerClipboardServer::PasteMode TigerClipboardServer::setPasteMode(PasteMode new
             pasteIterator_ = clipboard_.begin();
             break;
         case PasteMode::PASTE_BACK:
-            pasteIterator_ = clipboard_.end() - 1;
+            pasteIterator_ = clipboard_.end();
             break;
         default:
             break;
@@ -62,22 +64,22 @@ std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::copy(
         case CopyMode::COPY_FRONT:
             clipboard_.push_front(copiedString);
             copyIterator_ = clipboard_.begin();
-            pasteIterator_ = clipboard_.begin();
+            pasteIterator_ = clipboard_.begin(); //ITERATORS TRASHED AFTER PUSHES, NEED WAY TO KEEP TRACK OF PREVIOUS PASTE ITERATORS
             break;
         case CopyMode::COPY_BEFORE:
-            clipboard_.insert(copyIterator_, copiedString);
-            --copyIterator_;
+            copyIterator_ = clipboard_.insert(copyIterator_, copiedString);
+            pasteIterator_ = clipboard_.begin();
             break;
         case CopyMode::COPY_STATIC:
             *copyIterator_ = copiedString;
             break;
         case CopyMode::COPY_AFTER:
-            clipboard_.insert(++copyIterator_, copiedString);
-            --copyIterator_;
+            copyIterator_ = clipboard_.insert(++copyIterator_, copiedString);
+            pasteIterator_ = clipboard_.begin();
         case CopyMode::COPY_BACK:
             clipboard_.push_back(copiedString);
-            copyIterator_ = clipboard_.end() - 1;
-            pasteIterator_ = clipboard_.end() - 1;
+            copyIterator_ = clipboard_.end();
+            pasteIterator_ = clipboard_.end();
         default:
             return std::make_pair(Status::NOT_OK, ""); //should be unreachable
     }
@@ -115,7 +117,7 @@ std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::paste
                         if (pasteIterator_ != clipboard_.begin()) copyIterator_ = --pasteIterator_; //we want to check to see that we're not at the beginning of the deque, if so we decrement to get the iterator to one item before the deleted item to get desired insert after behavior
                         else copyIterator_ = pasteIterator_; //else we just take the current pasteIterator
                     case CopyMode::COPY_BACK:
-                        copyIterator_ = clipboard_.end() - 1;
+                        copyIterator_ = clipboard_.end();
                         break;
                     default:
                         break;
@@ -146,7 +148,7 @@ std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::paste
                     case CopyMode::COPY_AFTER:
                         copyIterator_ = pasteIterator_; //we want to insert after the destroyed item the old copyIterator was at, we want the new copyIterator to point to one decremented from the deleted item, since the pasteIterator was already decremented from where the old copyIterator was at, we can leave as is
                     case CopyMode::COPY_BACK:
-                        copyIterator_ = clipboard_.end() - 1;
+                        copyIterator_ = clipboard_.end();
                         break;
                     default:
                         break;
