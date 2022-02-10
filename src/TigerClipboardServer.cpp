@@ -21,6 +21,7 @@ void TigerClipboardServer::fixIteratorsFrontBack() {
             copyIterator_ = clipboard_.end();
             break;
         default:
+            if (copyIterator_ == clipboard_.end() && copyIterator_ != clipboard_.begin()) --copyIterator_;
             break;
     }
     
@@ -32,6 +33,7 @@ void TigerClipboardServer::fixIteratorsFrontBack() {
             pasteIterator_ = clipboard_.end();
             break;
         default:
+            if (pasteIterator_ == clipboard_.end() && pasteIterator_ != clipboard_.begin()) --pasteIterator_;
             break;
     }
 }
@@ -80,7 +82,7 @@ std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::copy(
             break;
         case CopyMode::COPY_BEFORE:
             if (copyIterator_ <= pasteIterator_) ++pasteItOffset;
-            copyIterator_ = clipboard_.insert(copyIterator_, copiedString);
+            copyIterator_ = clipboard_.insert(copyIterator_, copiedString) + 1;
             pasteIterator_ = clipboard_.begin() + pasteItOffset;
             break;
         case CopyMode::COPY_STATIC:
@@ -88,13 +90,13 @@ std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::copy(
             break;
         case CopyMode::COPY_AFTER:
             if (copyIterator_ < pasteIterator_) ++pasteItOffset;
-            copyIterator_ = clipboard_.insert(++copyIterator_, copiedString);
+            copyIterator_ = clipboard_.insert(++copyIterator_, copiedString) - 1;
             pasteIterator_ = clipboard_.begin() + pasteItOffset;
             break;
         case CopyMode::COPY_BACK:
             clipboard_.push_back(copiedString);
             copyIterator_ = clipboard_.end();
-            pasteIterator_ = clipboard_.end() + pasteItOffset;
+            pasteIterator_ = clipboard_.begin() + pasteItOffset;
             break;
         default:
             return std::make_pair(Status::NOT_OK, ""); //should be unreachable
