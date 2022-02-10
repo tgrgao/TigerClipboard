@@ -30,4 +30,5 @@ class TigerClipboardServer {
         std::deque<std::string> clipboard_;
         std::deque<std::string>::iterator copyIterator_;
         std::deque<std::string>::iterator pasteIterator_;
+        void fixIteratorsFrontBack();
 };
