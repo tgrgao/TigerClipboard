@@ -66,12 +66,12 @@ TEST_F(TigerClipboardServerTest, TestCopyFront) {
     clipboardServer.initServer();
     clipboardServer.copy("a");
     clipboardServer.copy("b");
-    clipboardServer.copy("c");
     clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_FRONT);
+    clipboardServer.copy("c");
     clipboardServer.copy("d");
     clipboardServer.copy("e");
 
-    std::deque<std::string> targetDeque ({"e", "d", "c"});
+    std::deque<std::string> targetDeque ({"e", "d", "c", "b"});
 
     EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
 }
@@ -81,12 +81,12 @@ TEST_F(TigerClipboardServerTest, TestCopyBack) {
     clipboardServer.initServer();
     clipboardServer.copy("a");
     clipboardServer.copy("b");
-    clipboardServer.copy("c");
     clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BACK);
+    clipboardServer.copy("c");
     clipboardServer.copy("d");
     clipboardServer.copy("e");
 
-    std::deque<std::string> targetDeque ({"c", "d", "e"});
+    std::deque<std::string> targetDeque ({"b", "c", "d", "e"});
 
     EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
 }
@@ -107,6 +107,22 @@ TEST_F(TigerClipboardServerTest, TestCopyBefore) {
     EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
 }
 
+TEST_F(TigerClipboardServerTest, TestCopyAfter) {
+    TigerClipboardServer clipboardServer;
+    clipboardServer.initServer();
+    clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BACK);
+    clipboardServer.copy("a");
+    clipboardServer.copy("b");
+    clipboardServer.copy("c");
+    clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_AFTER);
+    clipboardServer.copy("d");
+    clipboardServer.copy("e");
+
+    std::deque<std::string> targetDeque ({"a", "b", "c", "e", "d"});
+
+    EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
+}
+
 TEST_F(TigerClipboardServerTest, DEBUG) {
     TigerClipboardServer clipboardServer;
     clipboardServer.initServer();
@@ -122,6 +138,13 @@ TEST_F(TigerClipboardServerTest, DEBUG) {
 
 
 }  // namespace
+
+void printDeque(std::deque<std::string> deque) {
+    int pos = 0;
+    for (auto iter = deque.begin(); iter != deque.end(); ++iter) {
+        std::cout << pos << "\t" << *iter << "\n";
+    }
+}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
