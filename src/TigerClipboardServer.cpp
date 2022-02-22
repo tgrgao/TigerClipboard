@@ -16,6 +16,7 @@ void TigerClipboardServer::fixIteratorsFrontBack() {
     if (clipboard_.size() < 2) {
         copyIterator_ = clipboard_.begin();
         pasteIterator_ = copyIterator_;
+        return;
     }
 
     switch(copyMode_) {
