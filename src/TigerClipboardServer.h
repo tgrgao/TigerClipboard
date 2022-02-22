@@ -9,8 +9,8 @@ class TigerClipboardServer {
         enum PasteMode {PASTE_FRONT, PASTE_FORWARDS, PASTE_STATIC, PASTE_BACKWARDS, PASTE_BACK};
 
         Status initServer();
-        CopyMode setCopyMode(CopyMode newCopyMode);
-        PasteMode setPasteMode(PasteMode newPasteMode);
+        std::string setCopyMode(CopyMode newCopyMode);
+        std::string setPasteMode(PasteMode newPasteMode);
         Status setCopyIterator(const std::deque<std::string>::iterator& newCopyIterator);
         Status setPasteIterator(const std::deque<std::string>::iterator& newPasteIterator);
         std::pair<Status, std::string> copy(std::string copiedString);

@@ -13,12 +13,17 @@ TigerClipboardServer::Status TigerClipboardServer::initServer() {
 }
 
 void TigerClipboardServer::fixIteratorsFrontBack() {
+    if (clipboard_.size() < 2) {
+        copyIterator_ = clipboard_.begin();
+        pasteIterator_ = copyIterator_;
+    }
+
     switch(copyMode_) {
         case CopyMode::COPY_FRONT:
             copyIterator_ = clipboard_.begin();
             break;
         case CopyMode::COPY_BACK:
-            copyIterator_ = clipboard_.end();
+            copyIterator_ = clipboard_.end() - 1;
             break;
         default:
             if (copyIterator_ == clipboard_.end() && copyIterator_ != clipboard_.begin()) --copyIterator_;
@@ -30,7 +35,7 @@ void TigerClipboardServer::fixIteratorsFrontBack() {
             pasteIterator_ = clipboard_.begin();
             break;
         case PasteMode::PASTE_BACK:
-            pasteIterator_ = clipboard_.end();
+            pasteIterator_ = clipboard_.end() - 1;
             break;
         default:
             if (pasteIterator_ == clipboard_.end() && pasteIterator_ != clipboard_.begin()) --pasteIterator_;
@@ -38,16 +43,18 @@ void TigerClipboardServer::fixIteratorsFrontBack() {
     }
 }
 
-TigerClipboardServer::CopyMode TigerClipboardServer::setCopyMode(CopyMode newCopyMode) {
+std::string TigerClipboardServer::setCopyMode(CopyMode newCopyMode) {
     copyMode_ = newCopyMode;
     fixIteratorsFrontBack();
-    return copyMode_;
+    if (!clipboard_.empty()) return *pasteIterator_;
+    return "";
 }
 
-TigerClipboardServer::PasteMode TigerClipboardServer::setPasteMode(PasteMode newPasteMode) {
+std::string TigerClipboardServer::setPasteMode(PasteMode newPasteMode) {
     pasteMode_ = newPasteMode;
     fixIteratorsFrontBack();
-    return pasteMode_;
+    if (!clipboard_.empty()) return *pasteIterator_;
+    return "";
 }
 
 TigerClipboardServer::Status TigerClipboardServer::setCopyIterator(const std::deque<std::string>::iterator& newCopyIterator) {
@@ -95,7 +102,7 @@ std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::copy(
             break;
         case CopyMode::COPY_BACK:
             clipboard_.push_back(copiedString);
-            copyIterator_ = clipboard_.end();
+            copyIterator_ = clipboard_.end() - 1;
             pasteIterator_ = clipboard_.begin() + pasteItOffset;
             break;
         default:
@@ -177,11 +184,12 @@ std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::paste
         case PasteMode::PASTE_BACK:
             if (copyIterator_ + 1 == clipboard_.end()) --copyIterator_;
             clipboard_.pop_back();
-            pasteIterator_ = clipboard_.begin();
+            pasteIterator_ = clipboard_.end() - 1;
             break;
         default:
             return std::make_pair(Status::NOT_OK, ""); //should be unreachable
     }
     fixIteratorsFrontBack();
+    if (clipboard_.size() == 0) return std::make_pair(Status::OK, "");
     return std::make_pair(Status::OK, *pasteIterator_);
 }
