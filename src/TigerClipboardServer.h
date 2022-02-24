@@ -11,10 +11,11 @@ class TigerClipboardServer {
         Status initServer();
         std::string setCopyMode(CopyMode newCopyMode);
         std::string setPasteMode(PasteMode newPasteMode);
-        Status setCopyIterator(const std::deque<std::string>::iterator& newCopyIterator);
-        Status setPasteIterator(const std::deque<std::string>::iterator& newPasteIterator);
+        std::pair<Status, std::string> setCopyIterator(const std::deque<std::string>::iterator& newCopyIterator);
+        std::pair<Status, std::string> setPasteIterator(const std::deque<std::string>::iterator& newPasteIterator);
         std::pair<Status, std::string> copy(std::string copiedString);
         std::pair<Status, std::string> paste();
+        std::string upNext() {return *pasteIterator_;}
 
         const Status status() const {return status_;}
         const CopyMode copyMode() const {return copyMode_;}

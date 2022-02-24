@@ -58,14 +58,14 @@ std::string TigerClipboardServer::setPasteMode(PasteMode newPasteMode) {
     return "";
 }
 
-TigerClipboardServer::Status TigerClipboardServer::setCopyIterator(const std::deque<std::string>::iterator& newCopyIterator) {
+std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::setCopyIterator(const std::deque<std::string>::iterator& newCopyIterator) {
     copyIterator_ = clipboard_.erase(newCopyIterator, newCopyIterator);
-    return Status::OK;
+    return std::make_pair(Status::OK, *pasteIterator_);
 }
 
-TigerClipboardServer::Status TigerClipboardServer::setPasteIterator(const std::deque<std::string>::iterator& newPasteIterator) {
+std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::setPasteIterator(const std::deque<std::string>::iterator& newPasteIterator) {
     pasteIterator_ = clipboard_.erase(newPasteIterator, newPasteIterator);
-    return Status::OK;
+    return std::make_pair(Status::OK, *pasteIterator_);
 }
 
 std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::copy(std::string copiedString) {
