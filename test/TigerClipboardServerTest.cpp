@@ -185,22 +185,14 @@ TEST_F(TigerClipboardServerTest, TestPasteBack) {
     clipboardServer.copy("d");
     clipboardServer.copy("e");
 
-    std::cerr << "HERE! 0\n";
-
     std::string nextUp = clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_BACK);
     EXPECT_EQ(nextUp, "e");
-
-    std::cerr << "HERE! 1\n";
 
     nextUp = clipboardServer.paste().second;
     std::deque<std::string> targetDeque ({"a", "b", "c", "d"});
 
-    std::cerr << "HERE! 1.5\n";
-
     EXPECT_EQ(clipboardServer.clipboard(), targetDeque);
     EXPECT_EQ(nextUp, "d");
-
-    std::cerr << "HERE! 2\n";
 
     nextUp = clipboardServer.paste().second;
 
