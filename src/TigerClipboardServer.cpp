@@ -58,13 +58,15 @@ std::string TigerClipboardServer::setPasteMode(PasteMode newPasteMode) {
     return "";
 }
 
-std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::setCopyIterator(const std::deque<std::string>::iterator& newCopyIterator) {
-    copyIterator_ = clipboard_.erase(newCopyIterator, newCopyIterator);
+std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::setCopyIterator(int itOffset) {
+    if (itOffset > clipboard_.size()) return std::make_pair(Status::NOT_OK, "iterator out of range");
+    copyIterator_ = clipboard_.begin() + itOffset;
     return std::make_pair(Status::OK, *pasteIterator_);
 }
 
-std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::setPasteIterator(const std::deque<std::string>::iterator& newPasteIterator) {
-    pasteIterator_ = clipboard_.erase(newPasteIterator, newPasteIterator);
+std::pair<TigerClipboardServer::Status, std::string> TigerClipboardServer::setPasteIterator(int itOffset) {
+    if (itOffset > clipboard_.size()) return std::make_pair(Status::NOT_OK, "iterator out of range");
+    copyIterator_ = clipboard_.begin() + itOffset;
     return std::make_pair(Status::OK, *pasteIterator_);
 }
 

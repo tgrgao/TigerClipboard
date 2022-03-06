@@ -1,8 +1,13 @@
 #include "gtest/gtest.h"
 #include <iostream>
 #include <sstream>
+#include <list>
 
 #include "../src/TigerClipboardServer.h"
+
+std::list<std::string> opStringRun(std::string opString, std::list<std::string> targetOrder);
+std::list<std::string> executeOpString(std::string opString);
+void printList(std::list<std::string> list);
 
 namespace {
 
@@ -216,108 +221,118 @@ TEST_F(TigerClipboardServerTest, DEBUG) {
 }
 
 
+
+TEST_F(TigerClipboardServerTest, OPSTRING_DEBUG) {
+    std::string opString = "C a C b C c C d P P P";
+    std::list<std::string> targetOrder {"d", "d", "d"};
+    opStringRun(opString, targetOrder);
+}
+
+std::list<std::string> opStringRun(std::string opString, std::list<std::string> targetOrder) {
+    std::list<std::string> actualOrder = executeOpString(opString);
+    
+    std::cerr << "Target: " << "\t";
+    printList(targetOrder);
+    std::cerr << "Actual: " << "\t";
+    printList(actualOrder);
+
+    EXPECT_EQ(actualOrder, targetOrder);
+}
+
+
 }  // namespace
 
 void printDeque(std::deque<std::string> deque) {
     int pos = 0;
-    for (auto iter = deque.begin(); iter != deque.end(); ++iter) {
-        std::cerr << pos << "\t" << *iter << "\n";
+    for (auto it = deque.begin(); it != deque.end(); ++it) {
+        std::cerr << pos << "\t" << *it << "\n";
     }
 }
 
-std::list<std::string> executeOpSet(std::string opSet) {
+void printList(std::list<std::string> list) {
+    for (auto it = list.begin(); it != list.end(); ++it) {
+        std::cerr << *it;
+    }
+    std::cerr << std::endl;
+}
+
+std::list<std::string> executeOpString(std::string opString) {
     TigerClipboardServer clipboardServer;
     clipboardServer.initServer();
     std::list<std::string> pasteOrder;
-    std::istringstream iss(opSet);
+    std::istringstream iss(opString);
     std::string pasteBuff;
+    
+    std::string op;
+    std::string copyString;
+
+    std::string copyMode;
+    std::string pasteMode;
+    std::string offsetString;
+    int itOffset;
+    auto it = clipboardServer.clipboard().begin();
     do {
-        std::string op;
+        op;
         iss >> op;
-        switch(op) {
-            case "C":
-                std::string copyString;
+        if (op =="C") {
+                copyString;
                 iss >> copyString;
-                pasteBuff = clipboardServer.copy(copyString);
+                pasteBuff = clipboardServer.copy(copyString).second;
                 break;
-            case "P":
+        } else if (op == "P") {
                 pasteOrder.push_back(pasteBuff);
-                pasteBuff = clipboardServer.paste();
+                pasteBuff = clipboardServer.paste().second;
                 break;
-            case "SETCM":
-                std::string mode;
-                iss >> mode;
-                switch(mode) {
-                    case "FRONT":
-                        clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_FRONT);
-                        break;
-                    case "BEFORE":
-                        clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BEFORE);
-                        break;
-                    case "STATIC":
-                        clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_STATIC);
-                        break;
-                    case "AFTER":
-                        clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_AFTER);
-                        break;
-                    case "BACK":
-                        clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BACK);
-                        break;
-                    default:
-                        std::cerr << "ERROR: Invalid CopyMode: " << mode << std::endl;
-                        exit(1);
-                }
-                break;
-            case "SETPM":
-                std::string mode;
-                iss >> mode;
-                switch(mode) {
-                    case "FRONT":
-                        clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_FRONT);
-                        break;
-                    case "FORWARDS":
-                        clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_FORWARDS);
-                        break;
-                    case "STATIC":
-                        clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_STATIC);
-                        break;
-                    case "BACKWARDS":
-                        clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_BACKWARDS);
-                        break;
-                    case "BACK":
-                        clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_BACK);
-                        break;
-                    default:
-                        std::cerr << "ERROR: Invalid PasteMode: " << mode << std::endl;
-                        exit(1);
-                }
-                break;
-            case "SETCI":
-                std::string offSetString;
-                iss >> offSetString;
-                try {
-                int itOffSet = std::stoi(offSetString);
-                } catch (std::invalid_argument& e) {
-                    std::cerr << "ERROR: Invalid iterator offset: " << offSetString << std::endl;
-                }
-                auto it = clipboardServer.clipboard().begin();
-                for (int i = 0; i < itOffSet; ++i) ++it;
-                clipboardServer.setCopyIterator(it);
-                break;
-            case "SETPI":
-                std::string offSetString;
-                iss >> offSetString;
-                try {
-                int itOffSet = std::stoi(offSetString);
-                } catch (std::invalid_argument& e) {
-                    std::cerr << "ERROR: Invalid iterator offset: " << offSetString << std::endl;
-                }
-                auto it = clipboardServer.clipboard().begin();
-                for (int i = 0; i < itOffSet; ++i) ++it;
-                pasteBuff = clipboardServer.setPasteIterator(it);
-                break;
-            default:
-                std::cerr << "ERROR: Invalid op token: " << op << std::endl;
+        } else if (op == "SETCM") {
+            iss >> copyMode;
+            if (copyMode == "FRONT") clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_FRONT);
+            else if (copyMode == "BEFORE") clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BEFORE);
+            else if (copyMode == "STATIC") clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_STATIC);
+            else if (copyMode == "AFTER") clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_AFTER);
+            else if (copyMode == "BACK") clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_BACK);
+            else {
+                std::cerr << "ERROR: Invalid CopyMode: " << copyMode << std::endl;
+                exit(1);
+            }
+        } else if (op == "SETPM") {
+            iss >> pasteMode;
+            if (pasteMode == "FRONT")
+                pasteBuff = clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_FRONT);
+            else if (pasteMode == "FORWARDS")
+                pasteBuff = clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_FORWARDS);
+            else if (pasteMode == "STATIC")
+                pasteBuff = clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_STATIC);
+            else if (pasteMode == "BACKWARDS")
+                pasteBuff = clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_BACKWARDS);
+            else if (pasteMode == "BACK")
+                pasteBuff = clipboardServer.setPasteMode(TigerClipboardServer::PasteMode::PASTE_BACK);
+            else {
+                std::cerr << "ERROR: Invalid PasteMode: " << pasteMode << std::endl;
+                exit(1);
+            }
+        } else if (op == "SETCI") {
+            iss >> offsetString;
+            try {
+                itOffset = std::stoi(offsetString);
+            } catch (std::invalid_argument& e) {
+                std::cerr << "ERROR: Invalid iterator offset: " << offsetString << std::endl;
+            }
+            it = clipboardServer.clipboard().begin();
+            for (int i = 0; i < itOffset; ++i) ++it;
+            clipboardServer.setCopyIterator(it);
+        } else if (op == "SETPI") {
+            iss >> offsetString;
+            try {
+            int itOffSet = std::stoi(offsetString);
+            } catch (std::invalid_argument& e) {
+                std::cerr << "ERROR: Invalid iterator offset: " << offsetString << std::endl;
+            }
+            it = clipboardServer.clipboard().begin();
+            for (int i = 0; i < itOffset; ++i) ++it;
+            pasteBuff = clipboardServer.setPasteIterator(it);
+        } else {
+            std::cerr << "ERROR: Invalid op token: " << op << std::endl;
+            exit(1);
         }
     } while (iss);
     return pasteOrder;
