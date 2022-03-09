@@ -5,11 +5,13 @@
 
 #include "../src/TigerClipboardServer.h"
 
-std::list<std::string> opStringRun(std::string opString, std::list<std::string> targetOrder);
 std::list<std::string> executeOpString(std::string opString);
 void printList(std::list<std::string> list);
+void printDeque(std::deque<std::string> deque);
 
 namespace {
+
+void opStringRun(std::string opString, std::list<std::string> targetOrder);
 
 // The fixture for testing class Foo.
 class TigerClipboardServerTest : public ::testing::Test {
@@ -228,7 +230,7 @@ TEST_F(TigerClipboardServerTest, OPSTRING_DEBUG) {
     opStringRun(opString, targetOrder);
 }
 
-std::list<std::string> opStringRun(std::string opString, std::list<std::string> targetOrder) {
+void opStringRun(std::string opString, std::list<std::string> targetOrder) {
     std::list<std::string> actualOrder = executeOpString(opString);
     
     std::cerr << "Target: " << "\t";
@@ -261,6 +263,7 @@ std::list<std::string> executeOpString(std::string opString) {
     clipboardServer.initServer();
     std::list<std::string> pasteOrder;
     std::istringstream iss(opString);
+
     std::string pasteBuff;
     
     std::string op;
@@ -271,18 +274,15 @@ std::list<std::string> executeOpString(std::string opString) {
     std::string offsetString;
     int itOffset;
     auto it = clipboardServer.clipboard().begin();
-    do {
-        op;
-        iss >> op;
+    while (iss >> op) {
         if (op =="C") {
-                copyString;
-                iss >> copyString;
-                pasteBuff = clipboardServer.copy(copyString).second;
-                break;
+            copyString;
+            iss >> copyString;
+            pasteBuff = clipboardServer.copy(copyString).second;
         } else if (op == "P") {
-                pasteOrder.push_back(pasteBuff);
-                pasteBuff = clipboardServer.paste().second;
-                break;
+            pasteOrder.push_back(pasteBuff);
+            printList(pasteOrder);
+            pasteBuff = clipboardServer.paste().second;
         } else if (op == "SETCM") {
             iss >> copyMode;
             if (copyMode == "FRONT") clipboardServer.setCopyMode(TigerClipboardServer::CopyMode::COPY_FRONT);
@@ -317,9 +317,7 @@ std::list<std::string> executeOpString(std::string opString) {
             } catch (std::invalid_argument& e) {
                 std::cerr << "ERROR: Invalid iterator offset: " << offsetString << std::endl;
             }
-            it = clipboardServer.clipboard().begin();
-            for (int i = 0; i < itOffset; ++i) ++it;
-            clipboardServer.setCopyIterator(it);
+            clipboardServer.setCopyIterator(itOffset);
         } else if (op == "SETPI") {
             iss >> offsetString;
             try {
@@ -327,14 +325,12 @@ std::list<std::string> executeOpString(std::string opString) {
             } catch (std::invalid_argument& e) {
                 std::cerr << "ERROR: Invalid iterator offset: " << offsetString << std::endl;
             }
-            it = clipboardServer.clipboard().begin();
-            for (int i = 0; i < itOffset; ++i) ++it;
-            pasteBuff = clipboardServer.setPasteIterator(it);
+            pasteBuff = clipboardServer.setPasteIterator(itOffset).second;
         } else {
             std::cerr << "ERROR: Invalid op token: " << op << std::endl;
             exit(1);
         }
-    } while (iss);
+    }
     return pasteOrder;
 }
 
